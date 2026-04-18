@@ -1033,18 +1033,28 @@ def main():
         dur_total = {'1-3 Days': 3, '4-7 Days': 5, '8-14 Days': 10, 'More than 14 Days': 16}
         total_trip_days = dur_total.get(trip_duration, 5)
         num_cities = len(selected_cities)
-        if num_cities > 0:
-            base_days = max(2, total_trip_days // num_cities)
-            remainder = total_trip_days - (base_days * num_cities)
-        else:
-            base_days = 2
-            remainder = 0
 
+        # Distribute days across cities without exceeding total_trip_days
         itinerary_cities = []
-        for i, city in enumerate(selected_cities):
-            city_days = base_days + (1 if i < remainder else 0)
-            for _ in range(city_days):
-                itinerary_cities.append(city)
+        if num_cities > 0:
+            base_days = max(1, total_trip_days // num_cities)
+            remainder = total_trip_days - (base_days * num_cities)
+            # If remainder is negative, reduce base_days for later cities
+            if remainder < 0:
+                # More cities than days: give 1 day each until days run out
+                for i, city in enumerate(selected_cities):
+                    if i < total_trip_days:
+                        itinerary_cities.append(city)
+            else:
+                for i, city in enumerate(selected_cities):
+                    city_days = base_days + (1 if i < remainder else 0)
+                    for _ in range(city_days):
+                        itinerary_cities.append(city)
+        # Safety cap: never exceed the maximum days for the selected duration
+        dur_max = {'1-3 Days': 3, '4-7 Days': 7, '8-14 Days': 14, 'More than 14 Days': 21}
+        max_allowed = dur_max.get(trip_duration, 21)
+        if len(itinerary_cities) > max_allowed:
+            itinerary_cities = itinerary_cities[:max_allowed]
 
         total_distance = 0
         for i in range(len(selected_cities) - 1):
