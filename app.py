@@ -636,9 +636,9 @@ CUISINE_OPTIONS = [
     'International / Fusion', 'Fast Food / Burgers',
 ]
 BUDGET_OPTIONS = {
-    'Budget-Friendly - Less than 300 SAR': (0, 300),
-    'Mid-Range - 300 - 800 SAR': (300, 800),
-    'Luxury - More than 800 SAR': (800, 99999),
+    'Budget-Friendly - Less than 600 SAR': (0, 600),
+    'Mid-Range - 600 - 1,200 SAR': (600, 1200),
+    'Luxury - More than 1,200 SAR': (1200, 99999),
 }
 ACCOMMODATION_OPTIONS = {
     'Budget Hotel / Hostel': ['فندق', 'نزل'],
@@ -1073,10 +1073,13 @@ def main():
         all_day_activities = []
         hotel_data_list = []
         used_activities = set()
-        used_restaurants = set()
+        used_restaurants_per_city = {}  # Track used restaurants per city to avoid cross-city fallback
         random.seed(42)
 
         for day_idx, city in enumerate(itinerary_cities):
+            if city not in used_restaurants_per_city:
+                used_restaurants_per_city[city] = set()
+            used_restaurants = used_restaurants_per_city[city]
             city_acts = find_activities(df_activities, city, preferred_cats)
             if len(used_activities) > 0:
                 city_acts = city_acts[~city_acts['Attraction Name'].isin(used_activities)]

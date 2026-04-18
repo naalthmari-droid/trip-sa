@@ -163,8 +163,8 @@ def get_restaurant_for_meal(city, meal_type, budget_level='mid-range', used_rest
     
     restaurants = CITY_RESTAURANTS.get(city, [])
     if not restaurants:
-        # Fallback: try Riyadh restaurants
-        restaurants = CITY_RESTAURANTS.get('Riyadh', [])
+        # No restaurants for this city - use generic placeholder
+        return {'name_en': 'Local Restaurant', 'name_ar': 'مطعم محلي', 'cuisine': 'Local', 'price': 'mid-range'}
     
     # Filter by budget if possible
     budget_map = {
