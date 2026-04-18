@@ -947,14 +947,48 @@ def load_data():
 def main():
     # Mobile Sidebar Hint Bar
     st.markdown("""
-    <div class="mobile-sidebar-hint" onclick="
-        var btn = window.parent.document.querySelector('[data-testid=collapsedControl]');
-        if(btn) btn.click();
-    ">
+    <div class="mobile-sidebar-hint" id="sidebarHintBtn">
         <span class="hint-arrow">◀</span>
         <span class="hint-text">Tap here to open Trip Planner</span>
         <span class="hint-icon">🧭</span>
     </div>
+    <script>
+    (function() {
+        function openSidebar() {
+            // Try multiple selectors for different Streamlit versions
+            var doc = window.parent.document;
+            var selectors = [
+                '[data-testid="collapsedControl"]',
+                '[data-testid="stSidebarCollapsedControl"]',
+                'button[kind="header"]',
+                '.css-1rs6os',
+                'button[aria-label="Open sidebar"]'
+            ];
+            for (var i = 0; i < selectors.length; i++) {
+                var btn = doc.querySelector(selectors[i]);
+                if (btn) { btn.click(); return; }
+            }
+            // Fallback: try to find any button with the expand icon
+            var allBtns = doc.querySelectorAll('button');
+            for (var j = 0; j < allBtns.length; j++) {
+                var b = allBtns[j];
+                if (b.getAttribute('aria-expanded') === 'false' || 
+                    b.closest('[data-testid*="sidebar"]') ||
+                    b.closest('[data-testid*="Sidebar"]')) {
+                    b.click(); return;
+                }
+            }
+        }
+        // Attach click handler
+        var hint = document.getElementById('sidebarHintBtn');
+        if (hint) { hint.addEventListener('click', openSidebar); }
+        // Also try via parent
+        setTimeout(function() {
+            var hints = window.parent.document.querySelectorAll('.mobile-sidebar-hint');
+            hints.forEach(function(h) { h.addEventListener('click', openSidebar); });
+        }, 500);
+    })();
+    </script>
     """, unsafe_allow_html=True)
 
     # Hero Header - Premium Dark Card
