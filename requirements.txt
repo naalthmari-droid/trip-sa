@@ -1,0 +1,10 @@
+streamlit
+pandas
+numpy
+openpyxl
+fpdf2
+arabic-reshaper
+python-bidi
+folium
+streamlit-folium
+pydeck
