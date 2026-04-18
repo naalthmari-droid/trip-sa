@@ -47,7 +47,7 @@ st.set_page_config(
     page_title="TRIP.SA - Smart Trip Planner",
     page_icon=_app_icon,
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ============================================================
@@ -129,8 +129,10 @@ st.markdown("""
     .main .block-container { background: #0B1A0F !important; }
     .stApp { background: #0B1A0F !important; }
 
-    /* ---- Hide Streamlit defaults ---- */
+    /* ---- Hide Streamlit defaults & sidebar ---- */
     #MainMenu, footer, header { visibility: hidden; }
+    section[data-testid="stSidebar"] { display: none !important; }
+    [data-testid="collapsedControl"] { display: none !important; }
 
     /* ---- Scrollbar ---- */
     ::-webkit-scrollbar { width: 8px; }
@@ -138,46 +140,33 @@ st.markdown("""
     ::-webkit-scrollbar-thumb { background: #C5A43B; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
 
-    /* ---- Sidebar - Deep Forest ---- */
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #071208 0%, #0D2818 40%, #14532D 100%) !important;
-        border-right: 1px solid rgba(197, 164, 59, 0.2) !important;
-    }
-    section[data-testid="stSidebar"] * { color: #D1D5DB !important; }
-    section[data-testid="stSidebar"] .stSelectbox label,
-    section[data-testid="stSidebar"] .stMultiSelect label,
-    section[data-testid="stSidebar"] .stRadio label,
-    section[data-testid="stSidebar"] .stSlider label {
+    /* ---- Form Inputs Styling (Main Page) ---- */
+    .stSelectbox label, .stMultiSelect label {
         color: #C5A43B !important;
         font-weight: 600 !important;
         font-size: 0.9rem !important;
         letter-spacing: 0.5px !important;
-        text-transform: uppercase !important;
     }
-
-    /* ---- Sidebar Dropdowns ---- */
-    section[data-testid="stSidebar"] .stSelectbox > div > div,
-    section[data-testid="stSidebar"] .stMultiSelect > div > div {
+    .stSelectbox > div > div, .stMultiSelect > div > div {
         background-color: rgba(255,255,255,0.05) !important;
         border: 1px solid rgba(197, 164, 59, 0.3) !important;
         border-radius: 10px !important;
         backdrop-filter: blur(10px) !important;
     }
-    section[data-testid="stSidebar"] .stSelectbox > div > div *,
-    section[data-testid="stSidebar"] .stMultiSelect > div > div > div {
+    .stSelectbox > div > div *, .stMultiSelect > div > div > div {
         color: #E8E8E8 !important;
     }
-    section[data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] span,
-    section[data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] div {
+    .stSelectbox [data-baseweb="select"] span,
+    .stSelectbox [data-baseweb="select"] div {
         color: #C5A43B !important;
         font-weight: 500 !important;
     }
-    section[data-testid="stSidebar"] .stMultiSelect [data-baseweb="tag"] {
+    .stMultiSelect [data-baseweb="tag"] {
         background-color: rgba(197, 164, 59, 0.15) !important;
         border: 1px solid #C5A43B !important;
         border-radius: 20px !important;
     }
-    section[data-testid="stSidebar"] .stMultiSelect [data-baseweb="tag"] span {
+    .stMultiSelect [data-baseweb="tag"] span {
         color: #C5A43B !important;
         font-weight: 600 !important;
     }
@@ -191,9 +180,6 @@ st.markdown("""
         background-color: #1E3A2A !important;
     }
     [data-baseweb="popover"] { background-color: #162B1E !important; border: 1px solid rgba(197,164,59,0.3) !important; }
-    section[data-testid="stSidebar"] hr {
-        border-color: rgba(197, 164, 59, 0.15) !important;
-    }
 
     /* ---- Hero Header - Glassmorphism Card ---- */
     .hero-card {
@@ -201,7 +187,7 @@ st.markdown("""
         padding: 3rem 2.5rem;
         border-radius: 24px;
         text-align: center;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
         border: 1px solid rgba(197, 164, 59, 0.25);
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05);
         position: relative;
@@ -230,10 +216,7 @@ st.markdown("""
         text-shadow: 0 2px 20px rgba(197, 164, 59, 0.3);
         position: relative;
     }
-    .hero-card .logo-dot {
-        color: #22C55E;
-        font-size: 4.2rem;
-    }
+    .hero-card .logo-dot { color: #22C55E; font-size: 4.2rem; }
     .hero-card .tagline {
         color: #A7F3D0;
         font-size: 1.1rem;
@@ -252,6 +235,41 @@ st.markdown("""
         font-size: 2.5rem;
         margin-bottom: 0.5rem;
         display: block;
+    }
+
+    /* ---- Planner Form Card ---- */
+    .planner-card {
+        background: linear-gradient(145deg, #111F16 0%, #162B1E 100%);
+        border: 1px solid rgba(197, 164, 59, 0.2);
+        border-radius: 20px;
+        padding: 2rem 2rem 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        position: relative;
+    }
+    .planner-card::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #C5A43B, #22C55E, #C5A43B);
+        border-radius: 20px 20px 0 0;
+    }
+    .planner-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #C5A43B;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        letter-spacing: 2px;
+    }
+    .planner-subtitle {
+        text-align: center;
+        color: #9CA3AF;
+        font-size: 0.85rem;
+        margin-top: -1rem;
+        margin-bottom: 1.5rem;
     }
 
     /* ---- Overview Grid (KPI Cards) ---- */
@@ -480,52 +498,8 @@ st.markdown("""
     /* ---- Success/Info/Warning messages ---- */
     .stAlert { background: #111F16 !important; border-radius: 12px !important; }
 
-    /* ---- Mobile Sidebar Hint Bar ---- */
-    .mobile-sidebar-hint {
-        display: flex; align-items: center; justify-content: center;
-        background: linear-gradient(135deg, #14532D 0%, #1B6B3A 100%);
-        border: 1px solid rgba(197, 164, 59, 0.4);
-        border-radius: 12px;
-        padding: 0.7rem 1.2rem;
-        margin-bottom: 1rem;
-        cursor: pointer;
-        text-align: center;
-        animation: pulse-hint 2s ease-in-out infinite;
-        transition: all 0.3s ease;
-    }
-    .mobile-sidebar-hint:hover {
-        background: linear-gradient(135deg, #1B6B3A 0%, #22C55E 100%);
-        border-color: #C5A43B;
-    }
-    .mobile-sidebar-hint .hint-icon {
-        font-size: 1.3rem;
-        margin-right: 0.5rem;
-    }
-    .mobile-sidebar-hint .hint-text {
-        color: #C5A43B;
-        font-weight: 600;
-        font-size: 0.9rem;
-        letter-spacing: 0.5px;
-    }
-    .mobile-sidebar-hint .hint-arrow {
-        color: #22C55E;
-        font-size: 1.2rem;
-        margin-left: 0.5rem;
-        display: inline-block;
-        animation: bounce-arrow 1.5s ease-in-out infinite;
-    }
-    @keyframes pulse-hint {
-        0%, 100% { box-shadow: 0 0 5px rgba(197, 164, 59, 0.2); }
-        50% { box-shadow: 0 0 15px rgba(197, 164, 59, 0.4); }
-    }
-    @keyframes bounce-arrow {
-        0%, 100% { transform: translateX(0); }
-        50% { transform: translateX(-5px); }
-    }
-
     /* ---- PWA / Mobile Responsive ---- */
     @media (max-width: 768px) {
-        .mobile-sidebar-hint { }
         .hero-card { padding: 2rem 1.2rem; border-radius: 16px; }
         .hero-card .logo-text { font-size: 2.5rem !important; letter-spacing: 3px; }
         .hero-card .tagline { font-size: 0.85rem !important; }
@@ -541,6 +515,8 @@ st.markdown("""
         .day-header { font-size: 1rem; padding: 0.8rem 1.2rem; }
         .day-body { padding: 1rem; }
         .meal-card { font-size: 0.82rem; padding: 0.6rem; }
+        .planner-card { padding: 1.2rem; }
+        .planner-title { font-size: 1.1rem; }
     }
 
     @media (max-width: 480px) {
@@ -945,71 +921,6 @@ def load_data():
 # ============================================================
 
 def main():
-    # Sidebar Hint Bar - Using Streamlit native components
-    hint_cols = st.columns([1, 6, 1])
-    with hint_cols[1]:
-        sidebar_btn = st.button(
-            "◀ 🧭  Tap here to open Trip Planner  🧭 ▶",
-            key="open_sidebar_hint",
-            use_container_width=True
-        )
-    
-    # Inject CSS to style the hint button + auto-open sidebar script
-    st.markdown("""
-    <style>
-    /* Style the hint button */
-    button[kind="secondary"][data-testid="stBaseButton-secondary"] {
-        background: linear-gradient(135deg, #14532D 0%, #1B6B3A 100%) !important;
-        border: 1px solid rgba(197, 164, 59, 0.4) !important;
-        border-radius: 12px !important;
-        color: #C5A43B !important;
-        font-weight: 600 !important;
-        font-size: 0.95rem !important;
-        letter-spacing: 0.5px !important;
-        padding: 0.8rem 1.5rem !important;
-        animation: pulse-hint 2s ease-in-out infinite !important;
-        transition: all 0.3s ease !important;
-    }
-    button[kind="secondary"][data-testid="stBaseButton-secondary"]:hover {
-        background: linear-gradient(135deg, #1B6B3A 0%, #22C55E 100%) !important;
-        border-color: #C5A43B !important;
-        color: #FFD700 !important;
-    }
-    </style>
-    <script>
-    // Auto-inject sidebar opener into parent
-    (function() {
-        function tryOpenSidebar() {
-            try {
-                var doc = window.parent.document;
-                // Find the collapsed sidebar control
-                var ctrl = doc.querySelector('[data-testid="collapsedControl"]') ||
-                           doc.querySelector('[data-testid="stSidebarCollapsedControl"]') ||
-                           doc.querySelector('button[aria-label="Open sidebar"]');
-                if (ctrl) { ctrl.click(); }
-            } catch(e) {}
-        }
-        // Listen for clicks on hint buttons in parent
-        setTimeout(function() {
-            try {
-                var doc = window.parent.document;
-                var btns = doc.querySelectorAll('button');
-                btns.forEach(function(b) {
-                    if (b.textContent && b.textContent.includes('Trip Planner')) {
-                        b.addEventListener('click', function() {
-                            setTimeout(tryOpenSidebar, 100);
-                        });
-                    }
-                });
-            } catch(e) {}
-        }, 1000);
-    })();
-    </script>
-    """, unsafe_allow_html=True)
-    
-    if sidebar_btn:
-        st.sidebar.markdown("""<div style='text-align:center; padding:1rem; color:#C5A43B; font-size:1.2rem;'>✅ Trip Planner is open! Scroll down to fill your preferences.</div>""", unsafe_allow_html=True)
-
     # Hero Header - Premium Dark Card
     st.markdown("""
     <div class="hero-card">
@@ -1021,80 +932,88 @@ def main():
     """, unsafe_allow_html=True)
 
     # ============================================================
-    # Sidebar - Premium Dark Survey
+    # Trip Planner Form - On Main Page
     # ============================================================
-    st.sidebar.markdown("""
-    <div style="text-align:center; padding: 1rem 0 0.5rem;">
-        <div style="font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #C5A43B; font-weight: 700; letter-spacing: 3px;">TRIP<span style="color:#22C55E;">.</span>SA</div>
-        <div style="font-size: 0.7rem; color: #9CA3AF; letter-spacing: 2px; text-transform: uppercase; margin-top: 0.3rem;">Plan Your Journey</div>
+    st.markdown("""
+    <div class="planner-card">
+        <div class="planner-title">🧭 Plan Your Journey</div>
+        <div class="planner-subtitle">Fill in your preferences below and generate your personalized trip plan</div>
     </div>
     """, unsafe_allow_html=True)
-    st.sidebar.markdown("---")
 
-    trip_duration = st.sidebar.selectbox(
-        "How long is your stay in the Kingdom?",
-        options=TRIP_DURATION_OPTIONS, index=1
-    )
-    st.sidebar.markdown("---")
+    # Row 1: Duration + Traveler Type
+    col1, col2 = st.columns(2)
+    with col1:
+        trip_duration = st.selectbox(
+            "How long is your stay in the Kingdom?",
+            options=TRIP_DURATION_OPTIONS, index=1
+        )
+    with col2:
+        traveler_type = st.selectbox(
+            "How many people are traveling?",
+            options=TRAVELER_OPTIONS, index=0
+        )
 
-    traveler_type = st.sidebar.selectbox(
-        "How many people are traveling?",
-        options=TRAVELER_OPTIONS, index=0
-    )
-    st.sidebar.markdown("---")
+    # Row 2: Interests + Pace
+    col3, col4 = st.columns(2)
+    with col3:
+        interests = st.multiselect(
+            "What are your main interests? (Select up to 3)",
+            options=INTEREST_OPTIONS,
+            default=['History & Culture'],
+            max_selections=3
+        )
+    with col4:
+        pace = st.selectbox(
+            "What is your preferred travel pace?",
+            options=PACE_OPTIONS, index=1
+        )
 
-    interests = st.sidebar.multiselect(
-        "What are your main interests? (Select up to 3)",
-        options=INTEREST_OPTIONS,
-        default=['History & Culture'],
-        max_selections=3
-    )
     preferred_cats = []
     for interest in interests:
         preferred_cats.extend(INTEREST_TO_CATS.get(interest, []))
     preferred_cats = list(set(preferred_cats))
-    st.sidebar.markdown("---")
-
-    pace = st.sidebar.selectbox(
-        "What is your preferred travel pace?",
-        options=PACE_OPTIONS, index=1
-    )
     pace_key = get_pace_key(pace)
-    st.sidebar.markdown("---")
 
-    cuisines = st.sidebar.multiselect(
-        "What cuisines would you like to try?",
-        options=CUISINE_OPTIONS,
-        default=['Traditional Saudi']
-    )
-    st.sidebar.markdown("---")
+    # Row 3: Cuisines + Budget
+    col5, col6 = st.columns(2)
+    with col5:
+        cuisines = st.multiselect(
+            "What cuisines would you like to try?",
+            options=CUISINE_OPTIONS,
+            default=['Traditional Saudi']
+        )
+    with col6:
+        daily_budget = st.selectbox(
+            "What is your approximate daily budget for activities & food?",
+            options=list(BUDGET_OPTIONS.keys()), index=1
+        )
 
-    daily_budget = st.sidebar.selectbox(
-        "What is your approximate daily budget for activities & food?",
-        options=list(BUDGET_OPTIONS.keys()), index=1
-    )
-    st.sidebar.markdown("---")
-
+    # Row 4: Cities + Accommodation
     has_religious = 'Religious Tourism' in interests
     city_options = AVAILABLE_CITIES.copy()
     if not has_religious:
         city_options = [c for c in city_options if c not in ['Makkah', 'Madinah']]
 
-    selected_cities = st.sidebar.multiselect(
-        "Which cities would you like to visit?",
-        options=city_options,
-        default=['Riyadh'] if 'Riyadh' in city_options else [city_options[0]],
-        help="Makkah & Madinah are available only when 'Religious Tourism' is selected."
-    )
-    st.sidebar.markdown("---")
+    col7, col8 = st.columns(2)
+    with col7:
+        selected_cities = st.multiselect(
+            "Which cities would you like to visit?",
+            options=city_options,
+            default=['Riyadh'] if 'Riyadh' in city_options else [city_options[0]],
+            help="Makkah & Madinah are available only when 'Religious Tourism' is selected."
+        )
+    with col8:
+        accommodation_type = st.selectbox(
+            "What type of accommodation do you prefer?",
+            options=list(ACCOMMODATION_OPTIONS.keys()), index=2
+        )
 
-    accommodation_type = st.sidebar.selectbox(
-        "What type of accommodation do you prefer?",
-        options=list(ACCOMMODATION_OPTIONS.keys()), index=2
-    )
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("")
-    generate = st.sidebar.button("Generate Trip Plan", use_container_width=True)
+    # Generate Button - Centered
+    st.markdown("")
+    btn_col1, btn_col2, btn_col3 = st.columns([1, 2, 1])
+    with btn_col2:
+        generate = st.button("🧭  Generate Trip Plan", use_container_width=True)
 
     # ============================================================
     # Generate Trip Plan
@@ -1211,6 +1130,9 @@ def main():
     hotel_data_list = result['hotel_data_list']
     budget_range = BUDGET_OPTIONS.get(daily_budget, (0, 99999))
     total_days = len(itinerary_cities)
+
+    # ---- Divider ----
+    st.markdown("---")
 
     # ---- Overview Cards ----
     st.markdown('<div class="section-title">Trip Overview</div>', unsafe_allow_html=True)
