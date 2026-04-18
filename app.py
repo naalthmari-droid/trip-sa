@@ -626,8 +626,8 @@ INTEREST_OPTIONS = [
     'Shopping & Luxury', 'Relaxation & Wellness', 'Religious Tourism',
 ]
 PACE_OPTIONS = [
-    'Relaxed - One main activity per day with plenty of free time',
-    'Balanced - Two to three activities per day with a balance between exploration and rest',
+    'Relaxed - A calm pace with plenty of free time',
+    'Balanced - A balance between exploration and rest',
     'Action-Packed - A packed schedule to explore as many sites as possible',
 ]
 CUISINE_OPTIONS = [
