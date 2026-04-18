@@ -945,51 +945,70 @@ def load_data():
 # ============================================================
 
 def main():
-    # Mobile Sidebar Hint Bar
+    # Sidebar Hint Bar - Using Streamlit native components
+    hint_cols = st.columns([1, 6, 1])
+    with hint_cols[1]:
+        sidebar_btn = st.button(
+            "◀ 🧭  Tap here to open Trip Planner  🧭 ▶",
+            key="open_sidebar_hint",
+            use_container_width=True
+        )
+    
+    # Inject CSS to style the hint button + auto-open sidebar script
     st.markdown("""
-    <div class="mobile-sidebar-hint" id="sidebarHintBtn">
-        <span class="hint-arrow">◀</span>
-        <span class="hint-text">Tap here to open Trip Planner</span>
-        <span class="hint-icon">🧭</span>
-    </div>
+    <style>
+    /* Style the hint button */
+    button[kind="secondary"][data-testid="stBaseButton-secondary"] {
+        background: linear-gradient(135deg, #14532D 0%, #1B6B3A 100%) !important;
+        border: 1px solid rgba(197, 164, 59, 0.4) !important;
+        border-radius: 12px !important;
+        color: #C5A43B !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        letter-spacing: 0.5px !important;
+        padding: 0.8rem 1.5rem !important;
+        animation: pulse-hint 2s ease-in-out infinite !important;
+        transition: all 0.3s ease !important;
+    }
+    button[kind="secondary"][data-testid="stBaseButton-secondary"]:hover {
+        background: linear-gradient(135deg, #1B6B3A 0%, #22C55E 100%) !important;
+        border-color: #C5A43B !important;
+        color: #FFD700 !important;
+    }
+    </style>
     <script>
+    // Auto-inject sidebar opener into parent
     (function() {
-        function openSidebar() {
-            // Try multiple selectors for different Streamlit versions
-            var doc = window.parent.document;
-            var selectors = [
-                '[data-testid="collapsedControl"]',
-                '[data-testid="stSidebarCollapsedControl"]',
-                'button[kind="header"]',
-                '.css-1rs6os',
-                'button[aria-label="Open sidebar"]'
-            ];
-            for (var i = 0; i < selectors.length; i++) {
-                var btn = doc.querySelector(selectors[i]);
-                if (btn) { btn.click(); return; }
-            }
-            // Fallback: try to find any button with the expand icon
-            var allBtns = doc.querySelectorAll('button');
-            for (var j = 0; j < allBtns.length; j++) {
-                var b = allBtns[j];
-                if (b.getAttribute('aria-expanded') === 'false' || 
-                    b.closest('[data-testid*="sidebar"]') ||
-                    b.closest('[data-testid*="Sidebar"]')) {
-                    b.click(); return;
-                }
-            }
+        function tryOpenSidebar() {
+            try {
+                var doc = window.parent.document;
+                // Find the collapsed sidebar control
+                var ctrl = doc.querySelector('[data-testid="collapsedControl"]') ||
+                           doc.querySelector('[data-testid="stSidebarCollapsedControl"]') ||
+                           doc.querySelector('button[aria-label="Open sidebar"]');
+                if (ctrl) { ctrl.click(); }
+            } catch(e) {}
         }
-        // Attach click handler
-        var hint = document.getElementById('sidebarHintBtn');
-        if (hint) { hint.addEventListener('click', openSidebar); }
-        // Also try via parent
+        // Listen for clicks on hint buttons in parent
         setTimeout(function() {
-            var hints = window.parent.document.querySelectorAll('.mobile-sidebar-hint');
-            hints.forEach(function(h) { h.addEventListener('click', openSidebar); });
-        }, 500);
+            try {
+                var doc = window.parent.document;
+                var btns = doc.querySelectorAll('button');
+                btns.forEach(function(b) {
+                    if (b.textContent && b.textContent.includes('Trip Planner')) {
+                        b.addEventListener('click', function() {
+                            setTimeout(tryOpenSidebar, 100);
+                        });
+                    }
+                });
+            } catch(e) {}
+        }, 1000);
     })();
     </script>
     """, unsafe_allow_html=True)
+    
+    if sidebar_btn:
+        st.sidebar.markdown("""<div style='text-align:center; padding:1rem; color:#C5A43B; font-size:1.2rem;'>✅ Trip Planner is open! Scroll down to fill your preferences.</div>""", unsafe_allow_html=True)
 
     # Hero Header - Premium Dark Card
     st.markdown("""
