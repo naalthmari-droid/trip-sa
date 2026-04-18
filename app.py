@@ -480,8 +480,52 @@ st.markdown("""
     /* ---- Success/Info/Warning messages ---- */
     .stAlert { background: #111F16 !important; border-radius: 12px !important; }
 
+    /* ---- Mobile Sidebar Hint Bar ---- */
+    .mobile-sidebar-hint {
+        display: none;
+        background: linear-gradient(135deg, #14532D 0%, #1B6B3A 100%);
+        border: 1px solid rgba(197, 164, 59, 0.4);
+        border-radius: 12px;
+        padding: 0.7rem 1.2rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        text-align: center;
+        animation: pulse-hint 2s ease-in-out infinite;
+        transition: all 0.3s ease;
+    }
+    .mobile-sidebar-hint:hover {
+        background: linear-gradient(135deg, #1B6B3A 0%, #22C55E 100%);
+        border-color: #C5A43B;
+    }
+    .mobile-sidebar-hint .hint-icon {
+        font-size: 1.3rem;
+        margin-right: 0.5rem;
+    }
+    .mobile-sidebar-hint .hint-text {
+        color: #C5A43B;
+        font-weight: 600;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+    .mobile-sidebar-hint .hint-arrow {
+        color: #22C55E;
+        font-size: 1.2rem;
+        margin-left: 0.5rem;
+        display: inline-block;
+        animation: bounce-arrow 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-hint {
+        0%, 100% { box-shadow: 0 0 5px rgba(197, 164, 59, 0.2); }
+        50% { box-shadow: 0 0 15px rgba(197, 164, 59, 0.4); }
+    }
+    @keyframes bounce-arrow {
+        0%, 100% { transform: translateX(0); }
+        50% { transform: translateX(-5px); }
+    }
+
     /* ---- PWA / Mobile Responsive ---- */
     @media (max-width: 768px) {
+        .mobile-sidebar-hint { display: flex; align-items: center; justify-content: center; }
         .hero-card { padding: 2rem 1.2rem; border-radius: 16px; }
         .hero-card .logo-text { font-size: 2.5rem !important; letter-spacing: 3px; }
         .hero-card .tagline { font-size: 0.85rem !important; }
@@ -901,6 +945,18 @@ def load_data():
 # ============================================================
 
 def main():
+    # Mobile Sidebar Hint Bar
+    st.markdown("""
+    <div class="mobile-sidebar-hint" onclick="
+        var btn = window.parent.document.querySelector('[data-testid=collapsedControl]');
+        if(btn) btn.click();
+    ">
+        <span class="hint-arrow">◀</span>
+        <span class="hint-text">Tap here to open Trip Planner</span>
+        <span class="hint-icon">🧭</span>
+    </div>
+    """, unsafe_allow_html=True)
+
     # Hero Header - Premium Dark Card
     st.markdown("""
     <div class="hero-card">
