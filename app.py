@@ -482,7 +482,7 @@ st.markdown("""
 
     /* ---- Mobile Sidebar Hint Bar ---- */
     .mobile-sidebar-hint {
-        display: none;
+        display: flex; align-items: center; justify-content: center;
         background: linear-gradient(135deg, #14532D 0%, #1B6B3A 100%);
         border: 1px solid rgba(197, 164, 59, 0.4);
         border-radius: 12px;
@@ -525,7 +525,7 @@ st.markdown("""
 
     /* ---- PWA / Mobile Responsive ---- */
     @media (max-width: 768px) {
-        .mobile-sidebar-hint { display: flex; align-items: center; justify-content: center; }
+        .mobile-sidebar-hint { }
         .hero-card { padding: 2rem 1.2rem; border-radius: 16px; }
         .hero-card .logo-text { font-size: 2.5rem !important; letter-spacing: 3px; }
         .hero-card .tagline { font-size: 0.85rem !important; }
