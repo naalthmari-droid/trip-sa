@@ -619,6 +619,49 @@ CITY_COORDS = {
 
 AVAILABLE_CITIES = list(CITY_TO_ATTR.keys())
 
+# Approved Places Only data policy
+# The application must recommend attractions only from demo_attractions.xlsx, which is
+# the approved Visit Saudi attractions file supplied for the TRIPSA project. This
+# prevents accidental recommendations from geological, national parks, or historical
+# side datasets if they are uploaded next to the application.
+APPROVED_ATTRACTIONS_FILE = 'demo_attractions.xlsx'
+REQUIRED_ACTIVITY_COLUMNS = ['Attraction Name', 'City', 'Category', 'Latitude', 'Longitude', 'URL']
+EXCLUDED_ACTIVITY_CATEGORIES = {'Accommodations'}
+
+
+def normalize_approved_activities(df_activities):
+    """Clean and validate the approved attractions table before recommendation."""
+    if df_activities is None or df_activities.empty:
+        return pd.DataFrame(columns=REQUIRED_ACTIVITY_COLUMNS)
+
+    df = df_activities.copy()
+    df.columns = [str(col).strip() for col in df.columns]
+
+    for col in REQUIRED_ACTIVITY_COLUMNS:
+        if col not in df.columns:
+            df[col] = pd.NA
+
+    df['Attraction Name'] = df['Attraction Name'].astype(str).str.strip()
+    df['City'] = df['City'].astype(str).str.strip()
+    df['Category'] = df['Category'].astype(str).str.strip()
+    df['Category'] = df['Category'].replace({'': pd.NA, 'nan': pd.NA, 'None': pd.NA})
+    df['Category'] = df['Category'].fillna('General')
+
+    df = df[df['Attraction Name'].notna()]
+    df = df[df['Attraction Name'].astype(str).str.len() > 0]
+    df = df[~df['Category'].isin(EXCLUDED_ACTIVITY_CATEGORIES)]
+    df = df.drop_duplicates(subset=['Attraction Name', 'City'], keep='first')
+    return df.reset_index(drop=True)
+
+
+def load_approved_activities(search_dirs):
+    """Load only the approved attractions file and ignore unrelated tourism datasets."""
+    for directory in search_dirs:
+        path = os.path.join(directory, APPROVED_ATTRACTIONS_FILE)
+        if os.path.exists(path):
+            return normalize_approved_activities(pd.read_excel(path))
+    return None
+
 TRIP_DURATION_OPTIONS = ['1-3 Days', '4-7 Days', '8-14 Days', 'More than 14 Days']
 TRAVELER_OPTIONS = ['Solo Traveler', 'With a Partner', 'With Family', 'With Friends']
 INTEREST_OPTIONS = [
@@ -707,12 +750,15 @@ def find_hotels(df_hotels, city, budget_range, acc_type):
 
 
 def find_activities(df_activities, city, preferred_categories):
-    """Find activities matching city and preferred categories."""
+    """Find activities from the approved attractions file only."""
+    df_activities = normalize_approved_activities(df_activities)
     city_list = CITY_TO_ATTR.get(city, [city])
     mask = df_activities['City'].isin(city_list)
     acts = df_activities[mask].copy()
-    acts = acts[acts['Category'] != 'Accommodations']
+
+    acts = acts[~acts['Category'].isin(EXCLUDED_ACTIVITY_CATEGORIES)]
     acts = acts.dropna(subset=['Attraction Name'])
+
     if preferred_categories:
         cat_acts = acts[acts['Category'].isin(preferred_categories)]
         if len(cat_acts) >= 1:
@@ -721,8 +767,8 @@ def find_activities(df_activities, city, preferred_categories):
             religious_cats = {'Religious Site', 'Mosques'}
             if not religious_cats.intersection(set(preferred_categories)):
                 acts = acts[~acts['Category'].isin(religious_cats)]
-    return acts
 
+    return acts
 
 def get_pace_key(pace_full):
     """Extract pace key from full survey text."""
@@ -899,9 +945,13 @@ def build_map(selected_cities, all_day_activities, hotel_locations=None):
 
 @st.cache_resource
 def load_data():
-    """Load hotel and activity data from Excel files."""
+    """Load hotel data and the approved attractions file only."""
     df_hotels, df_activities = None, None
     search_dirs = ['.', '/mount/src/tripsa-app', '/mount/src/trip-sa', os.path.dirname(__file__)]
+
+    # Activities are intentionally loaded only from demo_attractions.xlsx.
+    df_activities = load_approved_activities(search_dirs)
+
     for d in search_dirs:
         try:
             for f in os.listdir(d):
@@ -909,9 +959,7 @@ def load_data():
                     path = os.path.join(d, f)
                     if 'hotel' in f.lower() or 'accommodation' in f.lower():
                         df_hotels = pd.read_excel(path)
-                    elif 'attraction' in f.lower() or 'demo' in f.lower():
-                        df_activities = pd.read_excel(path)
-        except:
+        except Exception:
             continue
     return df_hotels, df_activities
 
